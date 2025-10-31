@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import List
 from playwright.async_api import async_playwright
-from scrapers.base_scraper import BaseScraper
+from Class_Newsletters.base_scraper import BaseScraper
 from factory.scraper_factory import ScraperFactory
 from config import EMAIL_PROCESSING_DELAY
 
@@ -27,6 +27,7 @@ class EmailProcessor:
             results["errors"].append(error_msg)
             logger.error(error_msg)
             return results
+        
         
         async with async_playwright() as playwright:
             scraper = scraper_class()

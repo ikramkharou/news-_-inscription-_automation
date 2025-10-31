@@ -9,7 +9,15 @@ SUPPORTED_SITES = {
     "CNN": ["cnn.com", "edition.cnn.com"],
     "Fox News": ["foxnews.com", "fox.com"],
     "The Atlantic": ["theatlantic.com"],
-    "The Verge": ["theverge.com"]
+    "The Verge": ["theverge.com"],
+    "Vox": ["vox.com"],
+    "AP News": ["apnews.com"],
+    "National Review": ["nationalreview.com"],
+    "Axios": ["axios.com"],
+    "PennLive": ["pennlive.com"],
+    "The Guardian": ["theguardian.com"],
+    "TechCrunch": ["techcrunch.com"],
+    "Quartz": ["qz.com"]
 }
 
 logging.basicConfig(

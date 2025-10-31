@@ -10,7 +10,7 @@ def main():
     root = tk.Tk()
     app = NewsletterApp(root)
     root.mainloop()
-
+    
 
 if __name__ == "__main__":
     main()

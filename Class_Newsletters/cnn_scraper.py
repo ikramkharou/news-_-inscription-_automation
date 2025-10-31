@@ -12,6 +12,8 @@ class CNNScraper(BaseScraper):
 
     async def subscribe_email(self, page: Page, email: str):
         try:
+
+            # Implement the subscription logic for CNN
             await page.pause()
             
             button = page.locator('xpath=/html/body/div[3]/div/a')
@@ -46,6 +48,9 @@ class CNNScraper(BaseScraper):
 
             logger.info(f"Successfully clicked {clicked_count} newsletter buttons for {email}")
             
+
+
+            #fill email address and click sign up button
             try:
                 email_input = page.get_by_role("textbox", name="Email address")
                 await email_input.wait_for(state='visible', timeout=BROWSER_TIMEOUT)
@@ -60,6 +65,9 @@ class CNNScraper(BaseScraper):
                 logger.error(f"Error filling email or clicking Sign Up for {email}: {e}")
                 raise
             
+
+
+            #click start puzzle button for Arkose Labs captcha
             try:
                 await page.wait_for_timeout(3000)
                 
@@ -91,6 +99,10 @@ class CNNScraper(BaseScraper):
                         await start_puzzle_button.wait_for(state='visible', timeout=BROWSER_TIMEOUT)
                         await start_puzzle_button.click()
                         logger.info(f"Clicked Start Puzzle button (get_by_role method) for {email}")
+
+
+
+                        
                     except Exception as e:
                         logger.warning(f"Failed to click Start Puzzle button with get_by_role method: {e}")
             except Exception as e:

@@ -1,10 +1,18 @@
 import logging
 from typing import Optional, Type
-from scrapers.base_scraper import BaseScraper
-from scrapers.cnn_scraper import CNNScraper
-from scrapers.fox_scraper import FoxScraper
-from scrapers.theatlantic_scraper import TheAtlanticScraper
-from scrapers.theverge_scraper import TheVergeScraper
+from Class_Newsletters.base_scraper import BaseScraper
+from Class_Newsletters.cnn_scraper import CNNScraper
+from Class_Newsletters.fox_scraper import FoxScraper
+from Class_Newsletters.theatlantic_scraper import TheAtlanticScraper
+from Class_Newsletters.theverge_scraper import TheVergeScraper
+from Class_Newsletters.vox_scraper import VoxScraper
+from Class_Newsletters.apnews_scraper import APNewsScraper
+from Class_Newsletters.nationalreview_scraper import NationalReviewScraper
+from Class_Newsletters.axios_scraper import AxiosScraper
+from Class_Newsletters.pennlive_scraper import PennLiveScraper
+from Class_Newsletters.theguardian_scraper import TheGuardianScraper
+from Class_Newsletters.techcrunch_scraper import TechCrunchScraper
+from Class_Newsletters.quartz_scraper import QuartzScraper
 from config import SUPPORTED_SITES
 
 logger = logging.getLogger(__name__)
@@ -15,7 +23,15 @@ class ScraperFactory:
         "CNN": CNNScraper,
         "Fox News": FoxScraper,
         "The Atlantic": TheAtlanticScraper,
-        "The Verge": TheVergeScraper
+        "The Verge": TheVergeScraper,
+        "Vox": VoxScraper,
+        "AP News": APNewsScraper,
+        "National Review": NationalReviewScraper,
+        "Axios": AxiosScraper,
+        "PennLive": PennLiveScraper,
+        "The Guardian": TheGuardianScraper,
+        "TechCrunch": TechCrunchScraper,
+        "Quartz": QuartzScraper
     }
     
     @classmethod
