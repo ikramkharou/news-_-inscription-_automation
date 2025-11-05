@@ -1,5 +1,5 @@
 import logging
-from .base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from playwright.async_api import Page
 from config import BROWSER_TIMEOUT
 
