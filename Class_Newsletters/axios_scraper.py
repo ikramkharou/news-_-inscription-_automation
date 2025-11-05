@@ -1,5 +1,5 @@
 import logging
-from .base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from playwright.async_api import Page
 from config import BROWSER_TIMEOUT
 
@@ -12,7 +12,7 @@ class AxiosScraper(BaseScraper):
     
     async def subscribe_email(self, page: Page, email: str):
         try:
-            
+            await page.pause()
             #TODO: Implement the subscription logic for Axios
             button = page.locator('xpath=')
             await button.wait_for(state='visible', timeout=BROWSER_TIMEOUT)
