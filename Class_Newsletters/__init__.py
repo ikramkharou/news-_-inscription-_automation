@@ -1,4 +1,4 @@
-from .base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from .cnn_scraper import CNNScraper
 from .fox_scraper import FoxScraper
 from .theatlantic_scraper import TheAtlanticScraper
