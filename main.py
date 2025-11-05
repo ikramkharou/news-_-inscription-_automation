@@ -1,7 +1,7 @@
 import argparse
 import asyncio
 import sys
-from email import EmailProcessor, parse_emails
+from email_utils import EmailProcessor, parse_emails
 from factory.scraper_factory import ScraperFactory
 from config import logger
 

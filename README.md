@@ -40,7 +40,8 @@ News_inscrip/
 ├── factory/                # Factory pattern for scraper creation
 │   └── scraper_factory.py
 ├── config.py               # Configuration constants
-└── main.py                 # Application entry point (CLI)
+├── main.py                 # Application entry point (CLI)
+└── app.py                  # FastAPI REST API server
 ```
 
 ## Installation
@@ -53,7 +54,7 @@ cd news-_-inscription-_automation
 
 2. Install dependencies:
 ```bash
-pip install playwright
+pip install -r requirements.txt
 playwright install chromium
 ```
 
@@ -63,9 +64,9 @@ playwright install chromium
 
 ## Usage
 
-### Command Line Interface
+### Command Line Interface (CLI) - `main.py`
 
-The application runs from the command line with the following arguments:
+For command-line usage, use `main.py`. The application runs from the command line with the following arguments:
 
 ```bash
 python main.py --email <email> --url <url> --headless <true|false>
@@ -92,6 +93,23 @@ python main.py --email test@example.com --url https://www.cnn.com/newsletters --
 **Multiple emails (comma-separated):**
 ```bash
 python main.py --email email1@test.com,email2@test.com --url https://www.vox.com/newsletters --headless true
+```
+
+
+
+
+#### CORS Configuration
+
+The API is configured with CORS middleware to allow frontend integration. By default, it allows all origins. For production, update the `allow_origins` in `app.py`:
+
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yourfrontend.com"],  # Update this
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
 
 ### How It Works
@@ -171,6 +189,14 @@ _scraper_map = {
 
 - Python 3.7+
 - playwright
+- fastapi
+- uvicorn
+- pydantic
+
+All dependencies are listed in `requirements.txt`. Install with:
+```bash
+pip install -r requirements.txt
+```
 
 ## Output
 
