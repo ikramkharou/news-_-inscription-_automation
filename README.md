@@ -5,10 +5,11 @@ A modular Python application for automating newsletter subscriptions across mult
 ## Features
 
 - Modular architecture with separate scraper classes for each website
-- Tkinter-based GUI for easy email and URL input
+- Command-line interface (CLI) for easy automation
 - Automatic proxy rotation support
 - Support for multiple news websites
 - Clean, maintainable code structure
+- Headless and visible browser modes
 
 ## Supported Websites
 
@@ -30,18 +31,16 @@ A modular Python application for automating newsletter subscriptions across mult
 ```
 News_inscrip/
 ├── Class_Newsletters/      # Scraper classes for each website
-│   ├── base_scraper.py     # Base scraper class
 │   └── [website]_scraper.py
+├── core/                   # Core base classes
+│   └── base_scraper.py     # Base scraper class
+├── email/                  # Email processing and validation
+│   ├── processor.py        # Email processing service
+│   └── validator.py         # Email validation utilities
 ├── factory/                # Factory pattern for scraper creation
 │   └── scraper_factory.py
-├── services/               # Business logic layer
-│   └── email_processor.py
-├── gui/                    # User interface
-│   └── newsletter_app.py
-├── utils/                  # Utility functions
-│   └── email_validator.py
 ├── config.py               # Configuration constants
-└── main.py                 # Application entry point
+└── main.py                 # Application entry point (CLI)
 ```
 
 ## Installation
@@ -64,21 +63,44 @@ playwright install chromium
 
 ## Usage
 
-1. Run the application:
+### Command Line Interface
+
+The application runs from the command line with the following arguments:
+
 ```bash
-python main.py
+python main.py --email <email> --url <url> --headless <true|false>
 ```
 
-2. In the GUI:
-   - Enter the website URL in the URL field
-   - Enter email addresses (one per line) in the email list text area
-   - Click "Start Subscription" to begin
+### Arguments
 
-3. The application will:
-   - Detect the website from the URL
-   - Use the appropriate scraper class
-   - Process each email address
-   - Handle subscriptions automatically
+- `--email`: Email address(es) to subscribe (can be single email or comma-separated list)
+- `--url`: Website URL to subscribe to
+- `--headless`: Run browser in headless mode (`true` or `false`). Default: `false`
+
+### Examples
+
+**Single email with headless mode:**
+```bash
+python main.py --email test@example.com --url https://www.vox.com/newsletters --headless true
+```
+
+**Single email with visible browser:**
+```bash
+python main.py --email test@example.com --url https://www.cnn.com/newsletters --headless false
+```
+
+**Multiple emails (comma-separated):**
+```bash
+python main.py --email email1@test.com,email2@test.com --url https://www.vox.com/newsletters --headless true
+```
+
+### How It Works
+
+1. The application detects the website from the URL
+2. Uses the appropriate scraper class from the factory
+3. Processes each email address sequentially
+4. Handles subscriptions automatically with human-like delays
+5. Logs all results to the console
 
 ## Configuration
 
@@ -92,26 +114,26 @@ Edit `config.py` to customize:
 
 ## Architecture
 
-### Base Scraper
-All scraper classes inherit from `BaseScraper` which provides:
-- Proxy management
-- Browser launch and management
-- Common email processing workflow
+### Core Module
+The `core/` folder contains base classes:
+- `BaseScraper`: Provides proxy management, browser launch, and common email processing workflow
+
+### Email Module
+The `email/` folder contains:
+- `EmailProcessor`: Handles the business logic for processing multiple emails
+- `EmailValidator`: Provides email validation and parsing utilities
 
 ### Factory Pattern
 `ScraperFactory` automatically selects the correct scraper class based on the URL provided.
 
-### Service Layer
-`EmailProcessor` handles the business logic for processing multiple emails.
-
-### GUI Layer
-`NewsletterApp` provides a Tkinter-based interface for user interaction.
+### Scraper Classes
+Each website has its own scraper class in `Class_Newsletters/` that inherits from `BaseScraper` and implements site-specific subscription logic.
 
 ## Adding New Websites
 
 1. Create a new scraper class in `Class_Newsletters/`:
 ```python
-from .base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from playwright.async_api import Page
 
 class NewWebsiteScraper(BaseScraper):
@@ -120,6 +142,8 @@ class NewWebsiteScraper(BaseScraper):
     
     async def subscribe_email(self, page: Page, email: str):
         # Implement subscription logic
+        # Use page.locator(), page.get_by_role(), etc.
+        # Add delays with page.wait_for_timeout() for human-like behavior
         pass
 ```
 
@@ -147,7 +171,14 @@ _scraper_map = {
 
 - Python 3.7+
 - playwright
-- tkinter (usually included with Python)
+
+## Output
+
+The application provides detailed logging output showing:
+- Processing status for each email
+- Success/failure counts
+- Error messages if any failures occur
+- Final summary with total, success, and failed counts
 
 ## License
 
@@ -163,7 +194,7 @@ This project is provided as-is for educational purposes.
 ## Notes
 
 - Proxy file is gitignored for security
-- Browser runs in visible mode by default for debugging
-- Each scraper implements site-specific subscription logic
+- Browser runs in visible mode by default (use `--headless true` for headless)
+- Each scraper implements site-specific subscription logic with human-like delays
 - Logging is configured for debugging and monitoring
-
+- All output uses logger instead of print statements
