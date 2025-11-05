@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, Type
-from Class_Newsletters.base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from Class_Newsletters.cnn_scraper import CNNScraper
 from Class_Newsletters.fox_scraper import FoxScraper
 from Class_Newsletters.theatlantic_scraper import TheAtlanticScraper
