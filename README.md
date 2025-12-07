@@ -1,11 +1,12 @@
 # Newsletter Subscription Automation
 
-A modular Python application for automating newsletter subscriptions across multiple news websites using Playwright.
+A modular Node.js application for automating newsletter subscriptions across multiple news websites using Playwright.
 
 ## Features
 
 - Modular architecture with separate scraper classes for each website
 - Command-line interface (CLI) for easy automation
+- REST API for programmatic access
 - Automatic proxy rotation support
 - Support for multiple news websites
 - Clean, maintainable code structure
@@ -29,19 +30,20 @@ A modular Python application for automating newsletter subscriptions across mult
 ## Project Structure
 
 ```
-News_inscrip/
-├── Class_Newsletters/      # Scraper classes for each website
-│   └── [website]_scraper.py
+news-_-inscription-_automation/
+├── class/                  # Scraper classes for each website
+│   └── [website]-scraper.js
 ├── core/                   # Core base classes
-│   └── base_scraper.py     # Base scraper class
-├── email/                  # Email processing and validation
-│   ├── processor.py        # Email processing service
-│   └── validator.py         # Email validation utilities
+│   └── base-scraper.js     # Base scraper class
+├── email-utils/            # Email processing and validation
+│   ├── processor.js        # Email processing service
+│   └── validator.js        # Email validation utilities
 ├── factory/                # Factory pattern for scraper creation
-│   └── scraper_factory.py
-├── config.py               # Configuration constants
-├── main.py                 # Application entry point (CLI)
-└── app.py                  # FastAPI REST API server
+│   └── scraper-factory.js
+├── config.js               # Configuration constants
+├── main.js                 # Application entry point (CLI)
+├── app.js                  # Express REST API server
+└── package.json            # Node.js dependencies
 ```
 
 ## Installation
@@ -54,62 +56,103 @@ cd news-_-inscription-_automation
 
 2. Install dependencies:
 ```bash
-pip install -r requirements.txt
-playwright install chromium
+npm install
 ```
 
-3. Configure proxies (optional):
+3. Install Playwright browsers:
+```bash
+npx playwright install chromium
+```
+
+4. Configure proxies (optional):
    - Create a proxy file with format: `IP:PORT:USERNAME:PASSWORD`
-   - Update `PROXY_FILE` in `config.py` if using a different filename
+   - Update `PROXY_FILE` in `config.js` if using a different filename
 
 ## Usage
 
-### Command Line Interface (CLI) - `main.py`
+### Command Line Interface (CLI) - `main.js`
 
-For command-line usage, use `main.py`. The application runs from the command line with the following arguments:
+For command-line usage, use `main.js`. The application runs from the command line with the following arguments:
 
 ```bash
-python main.py --email <email> --url <url> --headless <true|false>
+node main.js --email <email> --url <url> [--headless <true|false>]
 ```
 
 ### Arguments
 
-- `--email`: Email address(es) to subscribe (can be single email or comma-separated list)
-- `--url`: Website URL to subscribe to
-- `--headless`: Run browser in headless mode (`true` or `false`). Default: `false`
+- `--email, -e`: Email address(es) to subscribe (can be single email or comma-separated list)
+- `--url, -u`: Website URL to subscribe to
+- `--headless, -h`: Run browser in headless mode (`true` or `false`). Default: `false`
 
 ### Examples
 
 **Single email with headless mode:**
 ```bash
-python main.py --email test@example.com --url https://www.vox.com/newsletters --headless true
+node main.js --email test@example.com --url https://www.vox.com/newsletters --headless true
 ```
 
 **Single email with visible browser:**
 ```bash
-python main.py --email test@example.com --url https://www.cnn.com/newsletters --headless false
+node main.js --email test@example.com --url https://www.cnn.com/newsletters --headless false
 ```
 
 **Multiple emails (comma-separated):**
 ```bash
-python main.py --email email1@test.com,email2@test.com --url https://www.vox.com/newsletters --headless true
+node main.js --email email1@test.com,email2@test.com --url https://www.vox.com/newsletters --headless true
+```
+
+### REST API - `app.js`
+
+Start the API server:
+```bash
+npm run api
+# or
+node app.js
 ```
 
 
+The API will run on `http://localhost:8000` by default.
 
+#### API Endpoints
+
+**Health Check:**
+```bash
+GET /health
+```
+
+**Get Supported Sites:**
+```bash
+GET /sites
+```
+
+**Subscribe to Newsletter:**
+```bash
+POST /subscribe
+Content-Type: application/json
+
+{
+  "url": "https://www.vox.com/newsletters",
+  "emails": ["test@example.com"],
+  "headless": true
+}
+```
+
+**Get Subscription Status:**
+```bash
+GET /subscribe/{task_id}
+```
 
 #### CORS Configuration
 
-The API is configured with CORS middleware to allow frontend integration. By default, it allows all origins. For production, update the `allow_origins` in `app.py`:
+The API is configured with CORS middleware to allow frontend integration. By default, it allows all origins. For production, update the CORS configuration in `app.js`:
 
-```python
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://yourfrontend.com"],  # Update this
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+```javascript
+app.use(cors({
+    origin: ["https://yourfrontend.com"],  // Update this
+    credentials: true,
+    methods: ["*"],
+    allowedHeaders: ["*"]
+}));
 ```
 
 ### How It Works
@@ -122,13 +165,13 @@ app.add_middleware(
 
 ## Configuration
 
-Edit `config.py` to customize:
+Edit `config.js` to customize:
 
 - `PROXY_FILE`: Path to proxy file
-- `DEFAULT_HEADLESS`: Browser headless mode (True/False)
+- `DEFAULT_HEADLESS`: Browser headless mode (true/false)
 - `BROWSER_TIMEOUT`: Timeout for browser operations in milliseconds
 - `EMAIL_PROCESSING_DELAY`: Delay between email processing in seconds
-- `SUPPORTED_SITES`: Dictionary of supported websites and their domains
+- `SUPPORTED_SITES`: Object of supported websites and their domains
 
 ## Architecture
 
@@ -137,7 +180,7 @@ The `core/` folder contains base classes:
 - `BaseScraper`: Provides proxy management, browser launch, and common email processing workflow
 
 ### Email Module
-The `email/` folder contains:
+The `email-utils/` folder contains:
 - `EmailProcessor`: Handles the business logic for processing multiple emails
 - `EmailValidator`: Provides email validation and parsing utilities
 
@@ -145,58 +188,68 @@ The `email/` folder contains:
 `ScraperFactory` automatically selects the correct scraper class based on the URL provided.
 
 ### Scraper Classes
-Each website has its own scraper class in `Class_Newsletters/` that inherits from `BaseScraper` and implements site-specific subscription logic.
+Each website has its own scraper class in `class/` that extends `BaseScraper` and implements site-specific subscription logic.
 
 ## Adding New Websites
 
-1. Create a new scraper class in `Class_Newsletters/`:
-```python
-from core.base_scraper import BaseScraper
-from playwright.async_api import Page
+1. Create a new scraper class in `class/`:
+```javascript
+import { BaseScraper } from '../core/base-scraper.js';
+import { logger, BROWSER_TIMEOUT } from '../config.js';
 
-class NewWebsiteScraper(BaseScraper):
-    def get_url(self) -> str:
-        return "https://example.com/newsletters"
-    
-    async def subscribe_email(self, page: Page, email: str):
-        # Implement subscription logic
-        # Use page.locator(), page.get_by_role(), etc.
-        # Add delays with page.wait_for_timeout() for human-like behavior
-        pass
+export class NewWebsiteScraper extends BaseScraper {
+    getUrl() {
+        return "https://example.com/newsletters";
+    }
+
+    async subscribeEmail(page, email) {
+        // Implement subscription logic
+        // Use page.locator(), page.getByRole(), etc.
+        // Add delays with page.waitForTimeout() for human-like behavior
+    }
+}
 ```
 
-2. Update `config.py`:
-```python
-SUPPORTED_SITES = {
-    # ... existing sites
+2. Update `config.js`:
+```javascript
+export const SUPPORTED_SITES = {
+    // ... existing sites
     "New Website": ["example.com"]
-}
+};
 ```
 
-3. Update `factory/scraper_factory.py`:
-```python
-from Class_Newsletters.newwebsite_scraper import NewWebsiteScraper
+3. Update `factory/scraper-factory.js`:
+```javascript
+import { NewWebsiteScraper } from '../class/newwebsite-scraper.js';
 
-_scraper_map = {
-    # ... existing scrapers
+// Add to _scraperMap
+static _scraperMap = {
+    // ... existing scrapers
     "New Website": NewWebsiteScraper
-}
+};
 ```
 
-4. Update `Class_Newsletters/__init__.py` to export the new class
+4. Export the new class from `class/newwebsite-scraper.js`
 
 ## Requirements
 
-- Python 3.7+
-- playwright
-- fastapi
-- uvicorn
-- pydantic
+- Node.js 18.0.0 or higher
+- npm or yarn package manager
 
-All dependencies are listed in `requirements.txt`. Install with:
+## Dependencies
+
+All dependencies are listed in `package.json`. Install with:
 ```bash
-pip install -r requirements.txt
+npm install
 ```
+
+Key dependencies:
+- `playwright`: Browser automation
+- `express`: Web framework for REST API
+- `zod`: Schema validation
+- `commander`: CLI argument parsing
+- `winston`: Logging
+- `uuid`: Task ID generation
 
 ## Output
 
@@ -205,6 +258,18 @@ The application provides detailed logging output showing:
 - Success/failure counts
 - Error messages if any failures occur
 - Final summary with total, success, and failed counts
+
+## Development
+
+Run in development mode with auto-reload:
+
+```bash
+# CLI
+npm run dev
+
+# API
+npm run api:dev
+```
 
 ## License
 
@@ -223,4 +288,4 @@ This project is provided as-is for educational purposes.
 - Browser runs in visible mode by default (use `--headless true` for headless)
 - Each scraper implements site-specific subscription logic with human-like delays
 - Logging is configured for debugging and monitoring
-- All output uses logger instead of print statements
+- All output uses logger instead of console statements
