@@ -1,5 +1,3 @@
-import { logger } from '../config.js';
-
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 /**
@@ -35,7 +33,6 @@ export function parseEmails(text) {
         }
     }
     
-    logger.info(`Parsed ${emails.length} valid email(s) from input`);
     return emails;
 }
 

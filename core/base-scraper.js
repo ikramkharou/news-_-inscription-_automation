@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
-import { logger, PROXY_FILE, DEFAULT_HEADLESS, BROWSER_TIMEOUT } from '../config.js';
+import { logger, PROXY_FILE, PROXY_URL, DEFAULT_HEADLESS } from '../config.js';
 
 export class BaseScraper {
     constructor(proxyFile = PROXY_FILE) {
@@ -11,20 +11,28 @@ export class BaseScraper {
     _loadProxies() {
         try {
             const proxies = [];
-            const content = readFileSync(this.proxyFile, 'utf-8');
-            const lines = content.split('\n');
-            
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (trimmed) {
-                    const parts = trimmed.split(':');
-                    if (parts.length === 4) {
-                        const [ip, port, username, password] = parts;
-                        proxies.push({
-                            server: `http://${ip}:${port}`,
-                            username,
-                            password
-                        });
+
+            if (PROXY_URL) {
+                // Support direct proxy URL via env, e.g. http://user:pass@host:port
+                proxies.push({ server: PROXY_URL });
+            }
+
+            if (this.proxyFile) {
+                const content = readFileSync(this.proxyFile, 'utf-8');
+                const lines = content.split('\n');
+                
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (trimmed) {
+                        const parts = trimmed.split(':');
+                        if (parts.length === 4) {
+                            const [ip, port, username, password] = parts;
+                            proxies.push({
+                                server: `http://${ip}:${port}`,
+                                username,
+                                password
+                            });
+                        }
                     }
                 }
             }

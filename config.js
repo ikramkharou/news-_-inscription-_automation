@@ -1,9 +1,22 @@
-import winston from 'winston';
+const boolFromEnv = (key, fallback = false) => {
+    const val = process.env[key];
+    if (val === undefined) return fallback;
+    return ["1", "true", "yes", "y"].includes(val.toString().trim().toLowerCase());
+};
 
-export const PROXY_FILE = "250 proxies (1).txt";
-export const DEFAULT_HEADLESS = false;
-export const EMAIL_PROCESSING_DELAY = 2; // seconds
-export const BROWSER_TIMEOUT = 10000; // milliseconds
+const numberFromEnv = (key, fallback) => {
+    const val = process.env[key];
+    if (val === undefined) return fallback;
+    const n = Number(val);
+    return Number.isFinite(n) ? n : fallback;
+};
+
+// Configuration strictly sourced from environment (no hardcoded defaults)
+export const PROXY_FILE = process.env.PROXY_FILE;
+export const PROXY_URL = process.env.PROXY_URL;
+export const DEFAULT_HEADLESS = boolFromEnv("HEADLESS");
+export const EMAIL_PROCESSING_DELAY = numberFromEnv("EMAIL_PROCESSING_DELAY"); // seconds
+export const BROWSER_TIMEOUT = numberFromEnv("BROWSER_TIMEOUT"); // milliseconds
 
 export const SUPPORTED_SITES = {
     "CNN": ["cnn.com", "edition.cnn.com"],
@@ -20,24 +33,10 @@ export const SUPPORTED_SITES = {
     "Quartz": ["qz.com"]
 };
 
-// Configure logger
-export const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.printf(({ timestamp, level, message, ...meta }) => {
-            return `${timestamp} - ${level.toUpperCase()} - ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-        })
-    ),
-    transports: [
-        new winston.transports.Console({
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.printf(({ timestamp, level, message, ...meta }) => {
-                    return `${timestamp} - ${level} - ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-                })
-            )
-        })
-    ]
-});
+// Simple logger replacement for desktop usage
+export const logger = {
+    info: (...args) => console.log('[INFO]', ...args),
+    warn: (...args) => console.warn('[WARN]', ...args),
+    error: (...args) => console.error('[ERROR]', ...args)
+};
 

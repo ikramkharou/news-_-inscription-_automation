@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node main.js",
-    "dev": "node --watch main.js",
-    "api": "node app.js",
-    "api:dev": "node --watch app.js"
+    "dev": "node --watch main.js"
   },
   "keywords": [
     "newsletter",
@@ -21,11 +19,6 @@
   "license": "MIT",
   "dependencies": {
     "playwright": "^1.40.0",
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "zod": "^3.22.4",
-    "commander": "^11.1.0",
-    "winston": "^3.11.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
