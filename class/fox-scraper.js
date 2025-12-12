@@ -45,12 +45,12 @@ async function findEmailField(page) {
         console.warn(`Error finding email field: ${e.message}`);
         return null;
     }
-}
-
+            }
+            
 // Helper: Find submit/subscribe button using multiple strategies
 async function findSubmitButton(page) {
     // Try Fox News specific structure first
-    try {
+            try {
         const foxNewsButton = page.locator('div.button.enter a').first();
         if (await foxNewsButton.isVisible().catch(() => false)) {
             console.log("Found Fox News specific submit button");
@@ -116,9 +116,9 @@ async function findSubscribeButtons(page) {
         // Get all potential button elements
         const allElements = await page.locator('button, a, input[type="button"], input[type="submit"]').all();
         const buttons = [];
-        
+            
         for (const element of allElements) {
-            try {
+                try {
                 const text = (await element.textContent().catch(() => '') || '').toLowerCase().trim();
                 const title = (await element.getAttribute('title').catch(() => '') || '').toLowerCase().trim();
                 const className = (await element.getAttribute('class').catch(() => '') || '').toLowerCase();
@@ -134,10 +134,10 @@ async function findSubscribeButtons(page) {
                 }
             } catch (e) {
                 // Skip this element
-                continue;
+                    continue;
+                }
             }
-        }
-        
+            
         console.log(`Found ${buttons.length} subscribe buttons`);
         return buttons;
     } catch (e) {
@@ -165,7 +165,7 @@ export async function subscribeEmail(page, email) {
         let clickedCount = 0;
         let failedClicks = 0;
         const targetClicks = Math.min(MAX_NEWSLETTERS, subscribeButtons.length);
-        
+            
         for (let i = 0; i < subscribeButtons.length; i++) {
             if (clickedCount >= targetClicks) {
                 console.log(`Reached target of ${targetClicks} subscriptions`);
@@ -339,10 +339,10 @@ export async function subscribeEmail(page, email) {
             } catch (e) {
                 failedClicks++;
                 console.log(`Error with newsletter ${i+1}: ${e.message.substring(0, 100)}`);
-                continue;
+                    continue;
+                }
             }
-        }
-        
+            
         console.log(`SUBSCRIPTION COMPLETE: ${clickedCount} successful, ${failedClicks} failed`);
         
         if (clickedCount === 0) {
@@ -350,8 +350,8 @@ export async function subscribeEmail(page, email) {
         }
         
         console.log(`Successfully subscribed to ${clickedCount} newsletter(s)`);
-    } catch (error) {
+        } catch (error) {
         console.error(`Error in subscription process: ${error.message}`);
-        throw error;
+            throw error;
     }
 }

@@ -1,0 +1,7 @@
+# Dependencies (install via: npm install)
+playwright>=1.40.0
+uuid>=9.0.1
+
+
+# Playwright Browser
+# Install Chromium: npx playwright install chromium

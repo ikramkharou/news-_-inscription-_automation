@@ -36,9 +36,7 @@ function parseBool(value, fallback = false) {
     return ["1", "true", "yes", "y"].includes(normalized);
 }
 
-function parseArgs(argv = process.argv.slice(2)) {
-    const args = { email: undefined, url: undefined, urls: undefined, headless: undefined, proxy: undefined };
-    
+function parseEnvArgs(argv = process.argv.slice(2)) {
     // Parse --envVARIABLE=value arguments and set them as environment variables
     const envArgs = argv.filter(arg => arg.startsWith("--env"));
     envArgs.forEach(arg => {
@@ -47,24 +45,6 @@ function parseArgs(argv = process.argv.slice(2)) {
             process.env[envMatch[1]] = envMatch[2];
         }
     });
-    
-    // Parse regular arguments - find index and get value directly
-    const emailIdx = argv.findIndex(arg => arg === "--email" || arg === "-e");
-    if (emailIdx !== -1 && argv[emailIdx + 1]) args.email = argv[emailIdx + 1];
-    
-    const urlIdx = argv.findIndex(arg => arg === "--url" || arg === "-u");
-    if (urlIdx !== -1 && argv[urlIdx + 1]) args.url = argv[urlIdx + 1];
-    
-    const urlsIdx = argv.findIndex(arg => arg === "--urls");
-    if (urlsIdx !== -1 && argv[urlsIdx + 1]) args.urls = argv[urlsIdx + 1];
-    
-    const headlessIdx = argv.findIndex(arg => arg === "--headless" || arg === "-h");
-    if (headlessIdx !== -1 && argv[headlessIdx + 1] !== undefined) args.headless = argv[headlessIdx + 1];
-    
-    const proxyIdx = argv.findIndex(arg => arg === "--proxy" || arg === "-p");
-    if (proxyIdx !== -1 && argv[proxyIdx + 1]) args.proxy = argv[proxyIdx + 1];
-    
-    return args;
 }
 
 function getScraperForUrl(url) {
@@ -124,12 +104,16 @@ async function processUrls(urls, email, headless, proxy) {
     }
 
     let browser = null;
+    let context = null;
     let page = null;
 
     try {
         console.log(`Launching browser once (headless=${headless}${proxy ? `, proxy=${proxy.server}` : ''})`);
         browser = await chromium.launch(launchOptions);
-        page = await browser.newPage();
+        context = await browser.newContext();
+        context.setDefaultNavigationTimeout(10_000);
+        context.setDefaultTimeout(10_000);
+        page = await context.newPage();
 
         for (const url of urls) {
             const scraper = getScraperForUrl(url);
@@ -150,7 +134,7 @@ async function processUrls(urls, email, headless, proxy) {
                 console.error(`[${url}] Fatal error: ${error.message}`);
                 // If the page was closed or crashed, recreate it for next URLs
                 if (page && page.isClosed && page.isClosed()) {
-                    page = await browser.newPage();
+                    page = await context.newPage();
                 }
                 results.push({ success: false, url, error: error.message });
             }
@@ -168,12 +152,13 @@ async function processUrls(urls, email, headless, proxy) {
 }
 
 async function main() {
-    const cli = parseArgs();
-    const email = cli.email ?? process.env.EMAIL ?? "";
-    const url = cli.url ?? process.env.URL ?? process.env.SITE_URL ?? "";
-    const urlsBase64 = cli.urls ?? process.env.URLS ?? "";
-    const headless = parseBool(cli.headless ?? process.env.HEADLESS, true);
-    const proxyUrl = cli.proxy ?? process.env.PROXY_URL ?? "";
+    parseEnvArgs();
+    
+    const email = process.env.EMAIL;
+    const url = process.env.URL || process.env.SITE_URL;
+    const urlsBase64 = process.env.URLS;
+    const headless = parseBool(process.env.HEADLESS, true);
+    const proxyUrl = process.env.PROXY_URL || process.env.PROXY;
 
     if (!email) {
         console.error("No email provided. Use --email or EMAIL env variable.");
